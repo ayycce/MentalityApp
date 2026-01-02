@@ -1,6 +1,8 @@
 package id.antasari.mentalityapp.data.local
 
+import androidx.room.*
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -24,4 +26,18 @@ interface MoodDao {
     // 4. Hapus Semua (Buat testing/reset)
     @Query("DELETE FROM mood_table")
     suspend fun clearAll()
+
+    // --- BAGIAN JURNAL (BARU) ---
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertJournal(journal: JournalEntity)
+
+    @Update
+    suspend fun updateJournal(journal: JournalEntity)
+
+    @Delete
+    suspend fun deleteJournal(journal: JournalEntity)
+
+    // Ambil semua jurnal, urutkan dari yang terbaru
+    @Query("SELECT * FROM journal_table ORDER BY timestamp DESC")
+    fun getAllJournals(): Flow<List<JournalEntity>>
 }

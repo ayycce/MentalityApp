@@ -76,7 +76,7 @@ fun MainScreen(
                 ) {
                     // HALAMAN UTAMA
                     composable(Screen.Home.route) { HomeScreen(navController, viewModel) }
-                    composable(Screen.Vent.route) { DailyDumpScreen(navController) }
+                    composable(Screen.Vent.route) { DailyDumpScreen(navController, viewModel) }
                     composable(Screen.Feed.route) { FeedScreen() } // Hapus parameter jika FeedScreen tidak butuh
                     composable(Screen.Garden.route) { GardenScreen() } // Hapus parameter jika GardenScreen tidak butuh
                     composable(Screen.More.route) { MoreScreen(navController) }
@@ -85,7 +85,8 @@ fun MainScreen(
                     composable(Screen.Profile.route) { ProfileScreen(navController) }
                     composable(Screen.Breathing.route) { BreathingScreen(navController) }
                     composable(Screen.CheckinHistory.route) { CheckinHistoryScreen(navController, viewModel) }
-                    composable(Screen.JournalDetail.route) { JournalDetailScreen(navController) }
+                    composable(Screen.JournalDetail.route) { JournalDetailScreen(navController, viewModel) }
+
                 }
 
                 // --- LAYER 2: NAVBAR MELAYANG (Di Depan/Atas) ---

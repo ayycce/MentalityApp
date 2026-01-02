@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [MoodEntity::class], version = 1, exportSchema = false)
+@Database(entities = [MoodEntity::class, JournalEntity::class], version = 2, exportSchema = false)
 abstract class MentalityDatabase : RoomDatabase() {
 
     abstract fun moodDao(): MoodDao
@@ -21,7 +21,7 @@ abstract class MentalityDatabase : RoomDatabase() {
                     MentalityDatabase::class.java,
                     "mentality_database"
                 )
-                    // .fallbackToDestructiveMigration() // Aktifkan ini kalau error versi DB pas development
+                    .fallbackToDestructiveMigration() // Aktifkan ini kalau error versi DB pas development
                     .build()
                 INSTANCE = instance
                 instance

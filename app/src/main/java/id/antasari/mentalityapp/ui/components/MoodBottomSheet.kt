@@ -73,8 +73,19 @@ fun MoodBottomSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Seberapa kuat rasanya?", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFamily)
-                Text("${intensity.toInt()}/5", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = SoftNeonPink, fontFamily = PoppinsFamily)
+                Text(
+                    "Seberapa kuat rasanya?",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = PoppinsFamily
+                )
+                Text(
+                    "${intensity.toInt()}/5",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = SoftNeonPink,
+                    fontFamily = PoppinsFamily
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -190,9 +201,16 @@ fun MoodBottomSheetContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = SoftNeonPink),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             contentPadding = PaddingValues(0.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(mainGradient)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
                     text = "Simpan",
                     fontSize = 16.sp,
@@ -205,3 +223,4 @@ fun MoodBottomSheetContent(
 
         Spacer(modifier = Modifier.height(24.dp))
     }
+}

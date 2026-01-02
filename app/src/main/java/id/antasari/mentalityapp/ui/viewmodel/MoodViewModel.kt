@@ -1,8 +1,12 @@
 package id.antasari.mentalityapp.ui.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.*
+import id.antasari.mentalityapp.data.local.JournalEntity
 import id.antasari.mentalityapp.data.local.MoodDao
 import id.antasari.mentalityapp.data.local.MoodEntity
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,13 +15,19 @@ import kotlinx.coroutines.launch
 
 class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
 
-    // StateFlow untuk menampung list history
+    // --- MOOD STATE ---
     private val _moodHistory = MutableStateFlow<List<MoodEntity>>(emptyList())
     val moodHistory = _moodHistory.asStateFlow()
 
+    // --- JOURNAL STATE (BARU) ---
+    private val _journalHistory = MutableStateFlow<List<JournalEntity>>(emptyList())
+    val journalHistory = _journalHistory.asStateFlow()
+
+    var selectedJournal by mutableStateOf<JournalEntity?>(null)
+
     init {
-        // Load data awal saat ViewModel dibuat
         fetchMoodHistory()
+        fetchJournalHistory() // Panggil fungsi load jurnal
     }
 
     private fun fetchMoodHistory() {
@@ -28,7 +38,16 @@ class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
         }
     }
 
-    // 🔥 FUNGSI ADD DIPERBARUI
+    // Load Data Jurnal
+    private fun fetchJournalHistory() {
+        viewModelScope.launch {
+            moodDao.getAllJournals().collect { journals ->
+                _journalHistory.value = journals
+            }
+        }
+    }
+
+    // Fungsi Add Mood (Tetap Sama)
     fun addMood(index: Int, intensity: Float, context: String?) {
         viewModelScope.launch {
             val label = when (index) {
@@ -40,10 +59,9 @@ class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
                 else -> "Neutral"
             }
 
-            // Pisahkan Pertanyaan dan Jawaban (Format: "Pertanyaan -> Jawaban")
+            // Logic split context (Pertanyaan -> Jawaban)
             val prompt: String?
             val answer: String?
-
             if (context != null && context.contains("->")) {
                 val parts = context.split("->")
                 prompt = parts.getOrNull(0)?.trim()
@@ -56,12 +74,48 @@ class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
             val newMood = MoodEntity(
                 moodIndex = index,
                 moodLabel = label,
-                intensity = intensity, // Simpan slider value
+                intensity = intensity,
                 contextPrompt = prompt,
                 contextAnswer = answer,
                 timestamp = System.currentTimeMillis()
             )
             moodDao.insertMood(newMood)
+        }
+    }
+
+    // --- FUNGSI BARU: SIMPAN JURNAL ---
+    fun addJournal(title: String, content: String) {
+        viewModelScope.launch {
+            val newJournal = JournalEntity(
+                title = title.ifBlank { "Untitled" }, // Default kalau judul kosong
+                content = content,
+                timestamp = System.currentTimeMillis()
+            )
+            moodDao.insertJournal(newJournal)
+        }
+    }
+
+    fun updateJournal(journal: JournalEntity, newTitle: String, newContent: String) {
+        viewModelScope.launch {
+            // Kita bikin copy data lama, tapi judul, isi, dan waktu kita update
+            val updatedEntry = journal.copy(
+                title = newTitle,
+                content = newContent,
+                timestamp = System.currentTimeMillis()
+            )
+
+            // Simpan perubahan ke Database
+            moodDao.updateJournal(updatedEntry)
+
+            // Update data yang lagi dipegang UI sekarang biar ID-nya sinkron
+            selectedJournal = updatedEntry
+        }
+    }
+
+    // --- FUNGSI BARU: HAPUS JURNAL ---
+    fun deleteJournal(journal: JournalEntity) {
+        viewModelScope.launch {
+            moodDao.deleteJournal(journal)
         }
     }
 }
