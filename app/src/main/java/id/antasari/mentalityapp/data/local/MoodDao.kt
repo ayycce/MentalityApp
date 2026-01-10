@@ -10,6 +10,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MoodDao {
+
+    // 1. Buat Halaman Utama (Vent) -> Ambil yg isArchived = 0 (False)
+    @Query("SELECT * FROM journal_table WHERE isArchived = 0 ORDER BY timestamp DESC")
+    fun getActiveJournals(): Flow<List<JournalEntity>>
+
+    // 2. Buat Halaman Arsip -> Ambil yg isArchived = 1 (True)
+    @Query("SELECT * FROM journal_table WHERE isArchived = 1 ORDER BY timestamp DESC")
+    fun getArchivedJournals(): Flow<List<JournalEntity>>
+
     // 1. Simpan Mood Baru
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMood(mood: MoodEntity)

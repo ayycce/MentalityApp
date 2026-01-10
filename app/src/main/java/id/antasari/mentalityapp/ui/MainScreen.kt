@@ -21,8 +21,6 @@ import id.antasari.mentalityapp.ui.components.BottomNavBar
 import id.antasari.mentalityapp.ui.navigation.Screen
 import id.antasari.mentalityapp.ui.theme.MainGradient
 import id.antasari.mentalityapp.ui.viewmodel.MoodViewModel
-
-// Import Semua Halaman
 import id.antasari.mentalityapp.ui.screens.*
 
 @Composable
@@ -38,64 +36,63 @@ fun MainScreen(
     val showBottomBar = currentRoute in listOf(
         Screen.Home.route,
         Screen.Vent.route,
-        Screen.Feed.route,
+        Screen.Profile.route, // Profile adalah Main Menu
         Screen.Garden.route,
-        Screen.More.route
+        Screen.More.route // Insight/More
     )
 
-    // 3. LAYOUT UTAMA (Gradient Full Screen)
+    // 3. LAYOUT UTAMA
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MainGradient) // Gradient Background
+            .background(MainGradient)
     ) {
-        // Gunakan Scaffold Transparan (Hanya untuk handle Status Bar padding)
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = Color.Black
         ) { innerPadding ->
 
-            // BOX WRAPPER (Untuk Teknik Overlay/Tumpuk)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding()) // Jarak aman dari Status Bar
+                    .padding(top = innerPadding.calculateTopPadding())
             ) {
 
-                // --- LAYER 1: KONTEN HALAMAN (Di Belakang) ---
+                // --- LAYER 1: KONTEN (Di Belakang) ---
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Home.route,
                     modifier = Modifier.padding(
-                        // Kalau Navbar muncul, kita kasih jarak bawah EXTRA (100dp)
-                        // Supaya konten paling bawah bisa discroll dan tidak ketutup Navbar melayang
-                        bottom = if (showBottomBar) 130.dp else 0.dp
-                        // Tips: Set 0.dp jika ingin konten "mengalir" di belakang navbar (efek kaca),
-                        // atau set 100.dp jika ingin konten berhenti tepat di atas navbar.
+                        // Padding bawah agar konten paling bawah tidak ketutup navbar
+                        bottom = if (showBottomBar) 100.dp else 0.dp
                     )
                 ) {
-                    // HALAMAN UTAMA
+                    // --- HALAMAN UTAMA (Main Tabs) ---
                     composable(Screen.Home.route) { HomeScreen(navController, viewModel) }
                     composable(Screen.Vent.route) { DailyDumpScreen(navController, viewModel) }
-                    composable(Screen.Feed.route) { FeedScreen() } // Hapus parameter jika FeedScreen tidak butuh
-                    composable(Screen.Garden.route) { GardenScreen() } // Hapus parameter jika GardenScreen tidak butuh
-                    composable(Screen.More.route) { MoreScreen(navController) }
+                    composable(Screen.More.route) { MoreScreen(navController) } // Insight
+                    composable(Screen.Profile.route) {
+                        // ✅ Tambahkan parameter viewModel di sini
+                        ProfileScreen(navController = navController, viewModel = viewModel)
+                    }
+                    // Kalau Feed & Garden belum ada filenya, comment dulu biar gak error
+                    composable(Screen.Feed.route) { FeedScreen() }
+                    composable(Screen.Garden.route) { GardenScreen() }
 
-                    // HALAMAN DETAIL
-                    composable(Screen.Profile.route) { ProfileScreen(navController) }
+                    // --- HALAMAN DETAIL / SUB-MENU ---
+                    composable(Screen.Archive.route) { ArchiveScreen(navController, viewModel) } // 🔥 JANGAN LUPA INI
                     composable(Screen.Breathing.route) { BreathingScreen(navController) }
                     composable(Screen.CheckinHistory.route) { CheckinHistoryScreen(navController, viewModel) }
                     composable(Screen.JournalDetail.route) { JournalDetailScreen(navController, viewModel) }
-
                 }
 
-                // --- LAYER 2: NAVBAR MELAYANG (Di Depan/Atas) ---
+                // --- LAYER 2: NAVBAR (Di Depan/Atas) ---
                 if (showBottomBar) {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter) // Tempel di Bawah Tengah
-                            .navigationBarsPadding() // Jaga jarak dari Garis Gesture HP (Edge-to-Edge)
-
+                            .align(Alignment.BottomCenter)
+                            .navigationBarsPadding() // Penting buat HP layarnya full
+                            .padding(bottom = 20.dp) // Kasih jarak dikit dari bawah biar melayang cantik
                     ) {
                         BottomNavBar(navController)
                     }

@@ -10,5 +10,7 @@ data class JournalEntity(
     val title: String,          // Judul Jurnal (Opsional, bisa otomatis tanggal)
     val content: String,        // Isi Curhatan Panjang
     val moodTag: Int? = null,   // (Opsional) Tag mood saat nulis: 0-4
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val imagePaths: List<String> = emptyList(),
+    val isArchived: Boolean = false
 )

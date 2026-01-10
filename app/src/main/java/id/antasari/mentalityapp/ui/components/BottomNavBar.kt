@@ -27,9 +27,9 @@ fun BottomNavBar(navController: NavController) {
     val items = listOf(
         Screen.Home,
         Screen.Vent,
-        Screen.Feed,
-        Screen.Garden, // <-- KEMBALI KE GARDEN (Hapus Breathe dari sini)
-        Screen.More
+        Screen.More,
+        Screen.Garden,
+        Screen.Profile
     )
 
     Box(

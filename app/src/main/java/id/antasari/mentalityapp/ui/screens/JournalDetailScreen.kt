@@ -2,6 +2,8 @@ package id.antasari.mentalityapp.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,17 +19,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import id.antasari.mentalityapp.data.local.JournalEntity
 import id.antasari.mentalityapp.ui.theme.MainGradient
 import id.antasari.mentalityapp.ui.theme.PoppinsFamily
 import id.antasari.mentalityapp.ui.theme.SoftNeonPink
 import id.antasari.mentalityapp.ui.viewmodel.MoodViewModel
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,6 +59,11 @@ fun JournalDetailScreen(
     // Format Tanggal
     val displayTimestamp = currentJournal?.timestamp ?: System.currentTimeMillis()
     val dateStr = SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault()).format(Date(displayTimestamp))
+    val context = LocalContext.current
+
+    // 🔥 AMBIL DATA FOTO 🔥
+    // Kita ambil list path foto, kalau null kita kasih list kosong
+    val imagePaths = currentJournal?.imagePaths ?: emptyList()
 
     Column(
         modifier = Modifier
@@ -85,18 +97,22 @@ fun JournalDetailScreen(
             // ACTION BUTTONS
             Row {
                 if (isEditing) {
-                    // TOMBOL SAVE (FIX BUG DELETE)
+                    // TOMBOL SAVE
                     IconButton(
                         onClick = {
                             if (hasChanges) {
                                 if (currentJournal != null) {
-                                    // 🔥 UPDATE DATA LAMA (ID TETAP SAMA)
+                                    // UPDATE DATA LAMA
                                     viewModel.updateJournal(currentJournal!!, title, content)
-                                    // Update state lokal biar UI refresh tanggal/isi
                                     currentJournal = currentJournal!!.copy(title = title, content = content, timestamp = System.currentTimeMillis())
                                 } else {
-                                    // 🔥 BUAT BARU
-                                    viewModel.addJournal(title, content)
+                                    // BUAT BARU
+                                    viewModel.addJournal(
+                                        context = context,
+                                        title = title,
+                                        content = content,
+                                        uris = emptyList()
+                                    )
                                 }
                                 isEditing = false
                             }
@@ -139,9 +155,37 @@ fun JournalDetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- TAMPILAN SESUAI MODE ---
+            // ------------------------------------------------------------
+            // 🔥 BAGIAN MENAMPILKAN FOTO (BARU) 🔥
+            // ------------------------------------------------------------
+            if (imagePaths.isNotEmpty()) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp) // Tinggi area foto
+                ) {
+                    items(imagePaths) { path ->
+                        // Load foto dari penyimpanan HP menggunakan path
+                        AsyncImage(
+                            model = File(path), // Ubah String path jadi File
+                            contentDescription = "Journal Image",
+                            contentScale = ContentScale.Crop, // Biar foto full kotak
+                            modifier = Modifier
+                                .width(200.dp) // Lebar per foto
+                                .fillMaxHeight()
+                                .clip(RoundedCornerShape(20.dp)) // Sudut membulat estetik
+                                .background(Color.Gray.copy(0.1f)) // Placeholder warna abu
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            // ------------------------------------------------------------
+
+            // --- TAMPILAN TEKS (EDIT vs BACA) ---
             if (isEditing) {
-                // 🔥 MODE EDIT: TAMPILAN CARD & LABEL (Sesuai Request) 🔥
+                // ... (BAGIAN INI SAMA SEPERTI SEBELUMNYA) ...
 
                 // 1. INPUT JUDUL
                 Text("Title", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFamily, color = Color.Black.copy(0.6f))
@@ -184,7 +228,9 @@ fun JournalDetailScreen(
                 }
 
             } else {
-                // 🔥 MODE BACA: TAMPILAN BERSIH (Sesuai Desain Awal) 🔥
+                // 🔥 MODE BACA 🔥
+
+                // Judul
                 Text(
                     text = title.ifEmpty { "Untitled" },
                     fontSize = 24.sp,
@@ -195,6 +241,7 @@ fun JournalDetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Isi Konten
                 Text(
                     text = content,
                     fontSize = 16.sp,

@@ -104,17 +104,7 @@ fun HomeScreen(navController: NavController, viewModel: MoodViewModel) {
                         fontFamily = PoppinsFamily
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable { navController.navigate(Screen.Profile.route) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Profile Placeholder (Huruf A)
-                    Text("A", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = SoftNeonPink, fontFamily = PoppinsFamily)
-                }
+
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -210,96 +200,6 @@ fun HomeScreen(navController: NavController, viewModel: MoodViewModel) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // D. PLAYLIST
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("healing playlist", fontWeight = FontWeight.Bold, fontFamily = PoppinsFamily)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("💖", fontSize = 14.sp)
-                }
-                Text("see all", fontSize = 14.sp, color = SoftNeonPink, fontFamily = PoppinsFamily)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            MusicListItem("late night study sesh", "lo-fi beats", playButtonBrush)
-            Spacer(modifier = Modifier.height(12.dp))
-            MusicListItem("cozy bedroom vibes", "chill ambient", playButtonBrush)
-            Spacer(modifier = Modifier.height(12.dp))
-            MusicListItem("midnight thoughts", "soft feels", playButtonBrush)
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // E. STATS GRID
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Check-ins Card
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(120.dp)
-                        .clickable { navController.navigate(Screen.CheckinHistory.route) },
-                    shape = RoundedCornerShape(32.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(checkInBrush)
-                            .padding(16.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text("check-ins", fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f), fontFamily = PoppinsFamily)
-                            Text("24", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White, fontFamily = PoppinsFamily)
-                            Text("this month 📊", fontSize = 10.sp, color = Color.White.copy(alpha = 0.8f), fontFamily = PoppinsFamily)
-                        }
-                    }
-                }
-
-                // Streak Card
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(120.dp)
-                        .clickable {
-                            navController.navigate(Screen.Garden.route) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                    shape = RoundedCornerShape(32.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(streakBrush)
-                            .padding(16.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text("streak", fontSize = 12.sp, color = Color.White.copy(alpha = 0.9f), fontFamily = PoppinsFamily)
-                            Text("7 days", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White, fontFamily = PoppinsFamily)
-                            Text("keep it up! 🔥", fontSize = 10.sp, color = Color.White.copy(alpha = 0.8f), fontFamily = PoppinsFamily)
-                        }
-                    }
-                }
-            }
-
             // SPACER AKHIR (Biar bisa scroll mentok di atas navbar)
             Spacer(modifier = Modifier.height(120.dp))
         }
@@ -387,33 +287,3 @@ fun HomeScreen(navController: NavController, viewModel: MoodViewModel) {
     }
 }
 
-// Komponen Helper untuk Playlist
-@Composable
-fun MusicListItem(title: String, subtitle: String, brush: Brush) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(80.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(12.dp).fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)).background(Color(0xFFF3F4F6))
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, fontFamily = PoppinsFamily)
-                Text(subtitle, fontSize = 12.sp, color = Color.Gray, fontFamily = PoppinsFamily)
-            }
-            Box(
-                modifier = Modifier.size(40.dp).clip(CircleShape).background(brush),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.White)
-            }
-        }
-    }
-}

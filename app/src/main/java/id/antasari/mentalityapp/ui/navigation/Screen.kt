@@ -8,7 +8,9 @@ import androidx.compose.material.icons.rounded.Book
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.MenuBook
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.SelfImprovement // Icon untuk Breathe/Garden
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,13 +21,15 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     // --- MENU UTAMA (Punya Icon) ---
     object Home : Screen("home", "Home", Icons.Rounded.Home)
     object Vent : Screen("vent", "Vent", Icons.Rounded.MenuBook)
+    object More : Screen("more", "Explore", Icons.Rounded.AutoAwesome)
     object Feed : Screen("feed", "Feed", Icons.Rounded.Article)
     object Garden : Screen("garden", "Garden", Icons.Rounded.Spa)
-    object More : Screen("more", "More", Icons.Rounded.AutoAwesome)
+    object Profile : Screen("profile", "Profile", Icons.Rounded.Person)
 
     // --- SUB-MENU / HALAMAN DETAIL (Icon Dummy saja karena tidak muncul di Navbar) ---
     // Kita kasih icon default (misal Home) biar tidak error, tapi tidak dipakai.
-    object Profile : Screen("profile", "Profile", Icons.Rounded.Home)
+
+    object Archive : Screen("archive_screen", "Archive", Icons.Rounded.Inventory2)
     object Breathing : Screen("breathing", "Breathe", Icons.Rounded.SelfImprovement)
     object CheckinHistory : Screen("checkin_history", "History", Icons.Rounded.Article)
     object JournalDetail : Screen("journal_detail", "Journal", Icons.Rounded.Edit)
