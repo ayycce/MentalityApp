@@ -18,6 +18,8 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
+import kotlinx.coroutines.flow.firstOrNull
+import java.util.Calendar
 
 class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
 
@@ -120,6 +122,21 @@ class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
                 timestamp = System.currentTimeMillis()
             )
             moodDao.insertMood(newMood)
+
+            val garden = moodDao.getGarden().firstOrNull()
+
+            if (garden != null) {
+                // Cek apakah hari ini SUDAH dapat token dari Mood?
+                if (!isSameDay(garden.lastMoodTokenDate)) {
+                    // Kalau belum, kasih token + update tanggal
+                    val updatedGarden = garden.copy(
+                        waterTokens = garden.waterTokens + 1,
+                        lastMoodTokenDate = System.currentTimeMillis(),
+                        pendingMoodReward = true // Nyalakan animasi popup
+                    )
+                    moodDao.insertGarden(updatedGarden)
+                }
+            }
         }
     }
 
@@ -161,10 +178,10 @@ class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
 
     // 2. Update Fungsi Add Journal: Terima Context & List URI
     fun addJournal(
-        context: Context,   // Tambahan: Butuh context buat akses file
+        context: Context,
         title: String,
         content: String,
-        uris: List<Uri>     // Tambahan: List foto dari UI
+        uris: List<Uri>
     ) {
         // Gunakan Dispatchers.IO karena proses copy file itu berat
         viewModelScope.launch(Dispatchers.IO) {
@@ -182,6 +199,20 @@ class MoodViewModel(private val moodDao: MoodDao) : ViewModel() {
                 imagePaths = savedPaths // 🔥 Masukkan path foto ke sini
             )
             moodDao.insertJournal(newJournal)
+
+            val garden = moodDao.getGarden().firstOrNull()
+
+            if (garden != null) {
+                // Cek apakah hari ini SUDAH dapat token dari Jurnal?
+                if (!isSameDay(garden.lastJournalTokenDate)) {
+                    val updatedGarden = garden.copy(
+                        waterTokens = garden.waterTokens + 1,
+                        lastJournalTokenDate = System.currentTimeMillis(),
+                        pendingJournalReward = true // Nyalakan animasi popup
+                    )
+                    moodDao.insertGarden(updatedGarden)
+                }
+            }
         }
     }
 
@@ -216,3 +247,13 @@ class MoodViewModelFactory(private val dao: MoodDao) : ViewModelProvider.Factory
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+// Helper: Cek apakah tanggal timestamp sama dengan Hari Ini
+private fun isSameDay(timestamp: Long): Boolean {
+    val date = Calendar.getInstance().apply { timeInMillis = timestamp }
+    val today = Calendar.getInstance()
+
+    return date.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+            date.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+}
+// Tutup Kurung Class MoodViewModel

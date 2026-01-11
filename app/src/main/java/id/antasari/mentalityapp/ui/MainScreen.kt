@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,12 +24,15 @@ import id.antasari.mentalityapp.ui.navigation.Screen
 import id.antasari.mentalityapp.ui.theme.MainGradient
 import id.antasari.mentalityapp.ui.viewmodel.MoodViewModel
 import id.antasari.mentalityapp.ui.screens.*
+import id.antasari.mentalityapp.ui.viewmodel.UserViewModel
 
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
-    viewModel: MoodViewModel
+    viewModel: MoodViewModel,
+    userViewModel: UserViewModel = viewModel()
 ) {
+    val userName by userViewModel.userName.collectAsState()
     // 1. Cek Route Saat Ini
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -68,7 +73,13 @@ fun MainScreen(
                     )
                 ) {
                     // --- HALAMAN UTAMA (Main Tabs) ---
-                    composable(Screen.Home.route) { HomeScreen(navController, viewModel) }
+                    composable(Screen.Home.route) {
+                        HomeScreen(
+                            userName = userName, // Parameter baru
+                            navController = navController,
+                            viewModel = viewModel
+                        )
+                    }
                     composable(Screen.Vent.route) { DailyDumpScreen(navController, viewModel) }
                     composable(Screen.More.route) { MoreScreen(navController) } // Insight
                     composable(Screen.Profile.route) {

@@ -46,7 +46,10 @@ data class MoodItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, viewModel: MoodViewModel) {
+fun HomeScreen(
+    userName: String,
+    navController: NavController,
+    viewModel: MoodViewModel) {
     // --- 1. DEFINISI WARNA & BRUSH ---
     val checkInBrush = Brush.linearGradient(listOf(Color(0xFFFBCFE8), Color(0xFFF472B6)))
     val streakBrush = Brush.linearGradient(listOf(Color(0xFFBAE6FD), Color(0xFF22D3EE)))

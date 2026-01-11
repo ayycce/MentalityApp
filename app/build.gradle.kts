@@ -86,4 +86,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     ksp("androidx.room:room-compiler:$room_version")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

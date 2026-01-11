@@ -49,4 +49,14 @@ interface MoodDao {
     // Ambil semua jurnal, urutkan dari yang terbaru
     @Query("SELECT * FROM journal_table ORDER BY timestamp DESC")
     fun getAllJournals(): Flow<List<JournalEntity>>
+
+    // --- GARDEN ---
+    @Query("SELECT * FROM garden_table WHERE id = 1")
+    fun getGarden(): Flow<GardenEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertGarden(garden: GardenEntity)
+
+    @Query("UPDATE garden_table SET currentXp = :xp, level = :lvl, waterTokens = :tokens WHERE id = 1")
+    suspend fun updateGardenState(xp: Int, lvl: Int, tokens: Int)
 }
