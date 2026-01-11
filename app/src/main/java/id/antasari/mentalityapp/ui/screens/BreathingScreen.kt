@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.VolumeOff
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.*
@@ -45,26 +46,47 @@ fun BreathingScreen(navController: NavController) {
     var isPlaying by remember { mutableStateOf(false) }
     var soundOn by remember { mutableStateOf(true) }
     var currentPhase by remember { mutableStateOf(BreathPhase.IDLE) }
-    var cycles by remember { mutableIntStateOf(0) }
 
-    // Logic Timer
+    // State Data
+    var cycles by remember { mutableIntStateOf(0) }
+    var totalSeconds by remember { mutableLongStateOf(0L) }
+
+    // 1. LOGIKA TIMER DETIK (Jalan terus setiap 1 detik)
+    LaunchedEffect(isPlaying) {
+        if (isPlaying) {
+            while (isPlaying) {
+                delay(1000) // Tunggu 1 detik
+                totalSeconds++ // Tambah detik
+            }
+        }
+    }
+
+    // 2. LOGIKA FASE NAPAS (Inhale - Hold - Exhale)
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
             if (currentPhase == BreathPhase.IDLE) currentPhase = BreathPhase.INHALE
             while (isPlaying) {
+                // Inhale
                 currentPhase = BreathPhase.INHALE
                 delay(BreathPhase.INHALE.duration.toLong())
                 if (!isPlaying) break
+
+                // Hold
                 currentPhase = BreathPhase.HOLD
                 delay(BreathPhase.HOLD.duration.toLong())
                 if (!isPlaying) break
+
+                // Exhale
                 currentPhase = BreathPhase.EXHALE
                 delay(BreathPhase.EXHALE.duration.toLong())
                 if (!isPlaying) break
+
+                // Rest
                 currentPhase = BreathPhase.REST
                 delay(BreathPhase.REST.duration.toLong())
                 if (!isPlaying) break
-                cycles++
+
+                cycles++ // Tambah cycle setelah 1 putaran selesai
             }
         } else {
             currentPhase = BreathPhase.IDLE
@@ -230,10 +252,10 @@ fun BreathingScreen(navController: NavController) {
                 StatCardSmall(label = "cycles", value = "$cycles")
                 Spacer(modifier = Modifier.width(16.dp))
                 // Hitung durasi
-                val totalSeconds = cycles * 14
+                // 🔥 Format Detik ke Menit:Detik
                 val minutes = totalSeconds / 60
                 val seconds = totalSeconds % 60
-                StatCardSmall(label = "duration", value = String.format("%d:%02d", minutes, seconds))
+                StatCardSmall(label = "duration", value = String.format("%02d:%02d", minutes, seconds))
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -276,33 +298,70 @@ fun BreathingScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Tombol Sound (Putih Bersih)
-            Button(
-                onClick = { soundOn = !soundOn },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(65.dp)
-                    .shadow(4.dp, RoundedCornerShape(50), spotColor = Color.Black.copy(alpha = 0.05f)),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(50)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = if (soundOn) Icons.Rounded.VolumeUp else Icons.Rounded.VolumeOff,
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = if (soundOn) "sound on" else "sound off",
-                        fontSize = 14.sp,
-                        color = Color.Gray,
-                        fontFamily = PoppinsFamily
-                    )
+            // DUA TOMBOL DI BAWAH (SOUND & RESET)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // Tombol Sound
+                Button(
+                    onClick = { soundOn = !soundOn },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(60.dp)
+                        .shadow(4.dp, RoundedCornerShape(50), spotColor = Color.Black.copy(alpha = 0.05f)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (soundOn) Icons.Rounded.VolumeUp else Icons.Rounded.VolumeOff,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (soundOn) "on" else "off",
+                            fontSize = 14.sp,
+                            color = Color.Gray,
+                            fontFamily = PoppinsFamily
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // 🔥 TOMBOL RESET (BARU) 🔥
+                Button(
+                    onClick = {
+                        isPlaying = false
+                        currentPhase = BreathPhase.IDLE
+                        cycles = 0
+                        totalSeconds = 0 // Reset waktu
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(60.dp)
+                        .shadow(4.dp, RoundedCornerShape(50), spotColor = Color.Black.copy(alpha = 0.05f)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(50)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = null,
+                            tint = Color(0xFFEF5350), // Warna Merah Soft
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "reset",
+                            fontSize = 14.sp,
+                            color = Color(0xFFEF5350),
+                            fontFamily = PoppinsFamily
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(50.dp))
         }
     }
 }

@@ -88,4 +88,10 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // SDK Google AI (Gemini)
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+
+    // Lifecycle Scope (buat jalanin AI di background)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 }

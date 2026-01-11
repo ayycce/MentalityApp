@@ -2,8 +2,11 @@ package id.antasari.mentalityapp.ui.screens
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,8 +16,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -22,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import id.antasari.mentalityapp.R
 import id.antasari.mentalityapp.ui.navigation.Screen
 import id.antasari.mentalityapp.ui.theme.MainGradient
 import id.antasari.mentalityapp.ui.theme.PoppinsFamily
@@ -31,7 +37,7 @@ import id.antasari.mentalityapp.ui.viewmodel.UserViewModel
 import kotlinx.coroutines.delay
 
 // ==========================================
-// 1. SPLASH SCREEN (ANIMATED)
+// 1. SPLASH SCREEN (ANIMATED) - UPDATED WITH CUSTOM LOGO
 // ==========================================
 @Composable
 fun SplashScreen(
@@ -39,19 +45,15 @@ fun SplashScreen(
     userViewModel: UserViewModel = viewModel()
 ) {
     val isFirstRun by userViewModel.isFirstRun.collectAsState()
-
-    // Animasi Scale untuk Logo (Bernapas)
-    val scale = remember { Animatable(0.5f) }
+    val scale = remember { Animatable(0.6f) } // Mulai sedikit lebih kecil
 
     LaunchedEffect(key1 = true) {
-        // Animasi logo membesar perlahan
         scale.animateTo(
             targetValue = 1f,
-            animationSpec = tween(durationMillis = 1000)
+            animationSpec = tween(durationMillis = 1200) // Animasi lebih halus
         )
-        delay(1000) // Tahan sebentar
+        delay(1500) // Tahan sebentar agar user bisa lihat logo barumu
 
-        // Navigasi Logic
         if (isFirstRun) {
             navController.navigate(Screen.NameInput.route) {
                 popUpTo(Screen.Splash.route) { inclusive = true }
@@ -70,34 +72,40 @@ fun SplashScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Rounded.Spa, // Logo sementara (Bisa diganti gambar)
-                contentDescription = null,
-                tint = SoftNeonPink,
+            // 🔥 MENGGUNAKAN LOGO CUSTOM YANG BARU DI-IMPORT
+            Image(
+                painter = painterResource(id = R.drawable.logo_utama), // Mengambil ikon baru
+                contentDescription = "Mentality Logo",
                 modifier = Modifier
-                    .size(80.dp)
-                    .scale(scale.value) // 🔥 Animasi diterapkan di sini
+                    .size(110.dp) // Ukuran sedikit lebih besar agar terlihat jelas
+                    .scale(scale.value)
+                    .clip(CircleShape) // Pastikan bulat
+                    .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape) // Border tipis transparan agar premium
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Text(
-                text = "Mentality.",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
+                text = "Mentality",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
                 fontFamily = PoppinsFamily,
-                color = SoftNeonPink,
-                letterSpacing = 1.sp
+                color = Color(0xFF37474F), // Warna teks lebih gelap agar kontras
+                letterSpacing = 2.sp
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "A gentle space for you.",
-                fontSize = 14.sp,
-                color = Color.Gray,
-                fontFamily = PoppinsFamily
+                fontSize = 15.sp,
+                color = Color.Gray.copy(alpha = 0.8f),
+                fontFamily = PoppinsFamily,
+                fontWeight = FontWeight.Medium
             )
         }
     }
 }
-
 // ==========================================
 // 2. NAME INPUT SCREEN (CLEAN & MODERN)
 // ==========================================

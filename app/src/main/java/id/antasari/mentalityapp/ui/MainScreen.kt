@@ -95,7 +95,54 @@ fun MainScreen(
                     composable(Screen.Breathing.route) { BreathingScreen(navController) }
                     composable(Screen.CheckinHistory.route) { CheckinHistoryScreen(navController, viewModel) }
                     composable(Screen.JournalDetail.route) { JournalDetailScreen(navController, viewModel) }
+
+                    composable("grounding/{id}") { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id") ?: "54321"
+                        GroundingScreen(navController = navController, techniqueId = id)
+                    }
+
+                    composable("color_therapy") {
+                        ColorTherapyScreen(navController)
+                    }
+
+                    composable("pop_it") {
+                        PopItScreen(navController)
+                    }
+
+                    // 1. Rute Library (Daftar Lagu)
+                    composable("sound_library") {
+                        SoundLibraryScreen(navController)
+                    }
+
+                    // 2. Rute Player (Pemutar Lagu dengan ID)
+                    composable("sound_player/{id}") { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id") ?: "1"
+                        SoundPlayerScreen(navController, trackId = id)
+                    }
+
+                    // 🔥 Rute List Artikel (dengan filter kategori)
+                    composable("article_list/{category}") { backStackEntry ->
+                        val category = backStackEntry.arguments?.getString("category") ?: "All"
+                        ArticleListScreen(navController, categoryFilter = category)
+                    }
+
+                    // 🔥 Rute Detail Artikel
+                    composable("article_detail/{id}") { backStackEntry ->
+                        val id = backStackEntry.arguments?.getString("id") ?: "1"
+                        ArticleDetailScreen(navController, articleId = id)
+                    }
+
+                    // 🔥 Rute Jar Screen
+                    composable("jar_screen") {
+                        JarScreen(navController)
+                    }
+
+                    composable("ai_chat") {
+                        AIChatScreen(navController)
+                    }
                 }
+
+
 
                 // --- LAYER 2: NAVBAR (Di Depan/Atas) ---
                 if (showBottomBar) {
